@@ -1,0 +1,17 @@
+---
+title: "BDA - Project"
+author: "Jan Nyberg, Carl-Victor Schauman"
+output: 
+  pdf_document: 
+    toc: yes
+    toc_depth: 1
+urlcolor: blue
+---
+\newpage
+
+```{r, include=FALSE}
+#Provided code and imports
+library("rstan")
+library(loo)
+set.seed(23)
+```
