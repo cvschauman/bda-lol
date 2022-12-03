@@ -18,11 +18,16 @@ set.seed(23)
 
 # Introduction
 
+
 # Description of the data
+
 
 # Description of models
 
+
 # Priors used
+
+
 
 # Rstan code
 
