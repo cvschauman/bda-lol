@@ -1,6 +1,7 @@
 ---
 title: "BDA - Project"
 author: "Jan Nyberg, Carl-Victor Schauman"
+date: 4/12/2022
 output: 
   pdf_document: 
     toc: yes
@@ -18,9 +19,12 @@ set.seed(23)
 
 # Introduction
 
+For this project, we are trying to predict Lewis Hamilton's average score in a season based on previous years scores. This is mostly just due to our curiosity if we are able to use this to somehow predict the score.   
+We are modeling his scores from five years, and trying to build a model using it. We want to see what kind of distribution the answer will be and how well it is able to estimate the following year. There are many factors we don't take into consideration, but we hope to see relatively good results and predictions.
 
 # Description of the data
 
+The data we use is from Kaggle and can be found [here](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020). We took Lewis Hamilton out of the data and chose the years 2015-2019. We selected his scores from all the races from those years. One thing to note with the data is that every year doesn't have an equal amount of races. To account for this we chose to fill in the missing races with the median for the year. This makes the data a bit inaccurate, however, it shouldn't have too big an effect on the data.
 
 # Description of models
 
