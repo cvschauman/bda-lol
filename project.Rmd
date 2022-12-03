@@ -15,6 +15,7 @@ urlcolor: blue
 library("rstan")
 library(loo)
 set.seed(23)
+ham_data = read.csv("ham2015-2019.csv")
 ```
 
 # Introduction
@@ -25,6 +26,26 @@ We are modeling his scores from five years, and trying to build a model using it
 # Description of the data
 
 The data we use is from Kaggle and can be found [here](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020). We took Lewis Hamilton out of the data and chose the years 2015-2019. We selected his scores from all the races from those years. One thing to note with the data is that every year doesn't have an equal amount of races. To account for this we chose to fill in the missing races with the median for the year. This makes the data a bit inaccurate, however, it shouldn't have too big an effect on the data.
+
+```{r, echo=FALSE}
+
+num_races = seq(1, 21, by=1)
+l <- as.list(as.data.frame(t(ham_data)))
+cum_sums <- list()
+for (i in l) {
+  cum_sums[length(cum_sums)+1] <- list(cumsum(i[3:23]))
+}
+#print(cum_sums[[1]])
+plot(num_races, cum_sums[[1]], type="l", main="Hamilton cumulative points",
+    xlab="Races", ylab="Points")
+
+lines(cum_sums[[2]], col="red")
+lines(cum_sums[[3]], col="blue")
+lines(cum_sums[[4]], col="yellow")
+lines(cum_sums[[5]], col="green")
+legend(x=2, y=400, legend=c("2015", "2016", "2017", "2018", "2019"),
+       col=c("black", "red", "blue", "yellow", "green"), lty=1, cex=0.8)
+```
 
 # Description of models
 
