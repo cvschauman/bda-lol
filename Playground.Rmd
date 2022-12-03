@@ -1,0 +1,37 @@
+---
+title: "code"
+format: pdf
+editor: visual
+---
+
+```{r}
+ham_data <- read.csv(file = './ham2015-2019.csv')
+head(ham_data)
+```
+
+```{r}
+num_races = seq(1, 21, by=1)
+num_races
+
+```
+
+```{r}
+l <- as.list(as.data.frame(t(ham_data)))
+cum_sums <- list()
+for (i in l) {
+  cum_sums[length(cum_sums)+1] <- list(cumsum(i[3:23]))
+}
+#print(cum_sums[[1]])
+plot(num_races, cum_sums[[1]], type="l", main="Hamilton cumulative points",
+    xlab="Races", ylab="Points")
+
+lines(cum_sums[[2]], col="red")
+lines(cum_sums[[3]], col="blue")
+lines(cum_sums[[4]], col="yellow")
+lines(cum_sums[[5]], col="green")
+legend(x=2, y=400, legend=c("2015", "2016", "2017", "2018", "2019"),
+       col=c("black", "red", "blue", "yellow", "green"), lty=1, cex=0.8)
+```
+
+```{}
+```
