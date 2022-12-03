@@ -15,3 +15,31 @@ library("rstan")
 library(loo)
 set.seed(23)
 ```
+
+# Introduction
+
+# Description of the data
+
+# Description of models
+
+# Priors used
+
+# Rstan code
+
+# Running of stan model
+
+# Convergence diagnostics
+
+# Posterior predictive checks
+
+# Predictive performance assessment 
+
+# Sensitivity analysis
+
+# Model comparison
+
+# Discussion of issues and potential improvements
+
+# Conclusion what was learned from the data analysis
+
+# Self-reflection
