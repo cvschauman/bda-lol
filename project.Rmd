@@ -13,9 +13,11 @@ urlcolor: blue
 ```{r, include=FALSE}
 #Provided code and imports
 library("rstan")
+library(matrixStats)
 library(loo)
 set.seed(23)
-ham_data = read.csv("ham2015-2019.csv")
+ham_data = read.csv("ham_data.csv", header=FALSE)
+old_ham = read.csv("ham2015-2019.csv")
 ```
 
 # Introduction
@@ -30,7 +32,7 @@ The data we use is from Kaggle and can be found [here](https://www.kaggle.com/da
 ```{r, echo=FALSE}
 
 num_races = seq(1, 21, by=1)
-l <- as.list(as.data.frame(t(ham_data)))
+l <- as.list(as.data.frame(t(old_ham)))
 cum_sums <- list()
 for (i in l) {
   cum_sums[length(cum_sums)+1] <- list(cumsum(i[3:23]))
@@ -55,6 +57,64 @@ legend(x=2, y=400, legend=c("2015", "2016", "2017", "2018", "2019"),
 
 
 # Rstan code
+
+```{stan, output.var="hier_ham"}
+data {
+  int<lower=0> N;
+  int<lower=0> J;
+  vector[J] y[N];
+  real<lower=0> mu_s;
+  real<lower=0> sigma_prior;
+}
+
+parameters {
+  real<lower=0> mu;
+  real<lower=0> sigma;
+  real<lower=0> tau;
+  vector[J] mus;
+}
+
+model {
+  mu ~ normal(0, mu_s);
+  tau ~ inv_chi_square(sigma_prior);
+  sigma ~ inv_chi_square(tau);
+  mus ~ normal(mu, tau);
+  
+  for (j in 1:J)
+    y[,j] ~ normal(mus[j], sigma);
+}
+
+generated quantities {
+  real ypred;
+  real ypred_6;
+  ypred = normal_rng(mus[5], sigma);
+  ypred_6 = normal_rng(mu, sigma);
+}
+```
+
+```{r}
+hier_data = list(
+  y = ham_data,
+  N = nrow(ham_data),
+  J = ncol(ham_data),
+  mu_s = 20,
+  sigma_prior = 5
+)
+
+hier_fit = sampling(
+  hier_ham,
+  data = ham_data,
+  chains = 4,
+  iter = 2000,
+  warmup = 1000,
+  refresh = 0
+)
+
+```
+```{r}
+nrow(ham_data)
+```
+
 
 # Running of stan model
 
