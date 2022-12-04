@@ -117,7 +117,7 @@ parameters {
 }
 model {
   // prior
-  mu ~ normal(mean_mu, mean_sigma);
+  mu ~ normal(0, mean_mu);
   sigma ~ inv_chi_square(mean_sigma);
   // likelihood
   y ~ normal(mu, sigma);
@@ -142,7 +142,6 @@ hier_data = list(
   y = ham_data,
   N = nrow(ham_data),
   J = ncol(ham_data),
-  U = 26,
   mu_s = 20,
   sigma_prior = 7
 )
@@ -195,8 +194,8 @@ pool_data = list(
   y = unlist(ham_data),
   N = nrow(ham_data),
   J = ncol(ham_data),
-  mean_mu = 18,
-  mean_sigma = 6
+  mean_mu = 20,
+  mean_sigma = 7
 )
 
 pool_fit = sampling(
@@ -271,9 +270,9 @@ Another convergence diagnostic we can look at is the ESS value we get out of the
 -   Bulk ESS of the pooled model: `r round(mean(pool_monitor[["Bulk_ESS"]][1:3]),2)`
 -   Tail ESS of the pooled model: `r round(mean(pool_monitor[["Tail_ESS"]][1:3]),2)`
 
-These ESS values measure the cruse effective sample sice for the bulk and tail quantities. A value over 100 is good and all of our values are over it.  
+These ESS values measure the cruse effective sample since for the bulk and tail quantities. A value over 100 is good and all of our values are over it.  
 
-Below are the traceplots 
+Below are the traceplots for the chains. As can be seen, they seem to converge well.
 
 ```{r, echo=FALSE}
 traceplot(
