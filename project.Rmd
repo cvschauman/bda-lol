@@ -269,6 +269,24 @@ Another convergence diagnostic we can look at is the ESS value we get out of the
 
 These ESS values measure the cruse effective sample sice for the bulk and tail quantities. A value over 100 is good and all of our values are over it.
 
+```{r}
+traceplot(
+  hier_fit,
+  nrow=4,
+  inc_warmup=FALSE,
+  pars=c("mu", "sigma", "tau", "ypred")
+)
+```
+
+```{r}
+traceplot(
+  pool_fit,
+  nrow=3,
+  inc_warmup=FALSE,
+  pars=c("mu", "sigma", "ypred")
+)
+```
+
 # Posterior predictive checks
 
 # Predictive performance assessment
