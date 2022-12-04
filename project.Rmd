@@ -483,4 +483,8 @@ In our project we decided to look at the results of an individual driver, but it
 
 # Conclusion what was learned from the data analysis
 
+We found that we can relatively well describe Lewis Hamilton's score by using a model with his previous results. It is not perfect, but with his consistency, and his recent results, they all fall well within the expected values in our model. If we could get him to drive for, say 100 more years with relatively even consistency, we could probably plot the results close to our plot.
+
 # Self-reflection
+
+During this project, we learned that it is relatively easy to get some kind of model going. We didn't want to choose some really easy data set, which lead us to have to put in quite some work into getting rolling with the project. We aren't totally sure about the results, however, they seem to quite well simulate the real world even with the limited amount of parameters we used. We also learned while choosing a data set that it can be quite hard to model some things.
