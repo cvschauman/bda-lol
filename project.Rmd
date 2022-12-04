@@ -64,6 +64,7 @@ Below is the code for the hierarchical model for Hamilton's points.
 data {
   int<lower=0> N;
   int<lower=0> J;
+  real U;
   vector[J] y[N];
   real<lower=0> mu_s;
   real<lower=0> sigma_prior;
@@ -111,6 +112,7 @@ hier_data = list(
   y = ham_data,
   N = nrow(ham_data),
   J = ncol(ham_data),
+  U = 26,
   mu_s = 20,
   sigma_prior = 7
 )
@@ -125,9 +127,11 @@ hier_fit = sampling(
 )
 
 ham_extracted = extract(hier_fit)$ypred
-hist(ham_extracted, breaks = seq(min(ham_extracted), max(ham_extracted), length.out = 30), 
+ham_extracted26 = ham_extracted[ham_extracted < 26]
+
+hist(ham_extracted26, breaks = seq(min(ham_extracted26), max(ham_extracted26), length.out = 30), 
      xlab="", ylab="Density",main="Predictive distribution of the mean hamilton the next season", 
-     col="lightblue", xlim=c(0,40))
+     col="lightblue", xlim=c(0,28))
 
 ```
 
@@ -138,6 +142,7 @@ hier_extracted = extract_log_lik(hier_fit, merge_chains = FALSE)
 r_eff = relative_eff(exp(hier_extracted))
 hier_loo = loo(hier_extracted, r_eff = r_eff)
 hier_elpd = hier_loo$estimates["elpd_loo",1]
+hier_loo
 paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
 plot(hier_loo)
 ```

@@ -5,8 +5,9 @@ editor: visual
 ---
 
 ```{r}
-ham_data <- read.csv(file = './ham2015-2019.csv')
-head(ham_data)
+ham_data <- read.csv(file = './ham_data.csv', header=FALSE)
+#ham_data = t(ham_data)
+ham_data
 ```
 
 ```{r}
@@ -34,6 +35,10 @@ legend(x=2, y=400, legend=c("2015", "2016", "2017", "2018", "2019"),
 ```
 
 ```{r}
-ham_data = t(ham_data)
+ham_data
+
+```
+```{r}
+sd(ham_data[,3])
 
 ```
