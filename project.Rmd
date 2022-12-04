@@ -60,6 +60,8 @@ legend(
 
 # Rstan code
 
+## Hierarchical stan model
+
 Below is the code for the hierarchical model for Hamilton's points.
 
 ```{stan, output.var="hier_ham"}
@@ -101,6 +103,36 @@ generated quantities {
 }
 ```
 
+## Non-hierarchical stan model
+
+```{stan, output.var="pool_ham"}
+data {
+  int<lower=0> N;
+  int<lower=0> J;
+  vector[N*J] y;
+  real mean_mu;
+  real<lower=0> mean_sigma;
+  
+}
+parameters {
+  real mu;
+  real<lower=0> sigma;
+}
+model {
+  // prior
+  mu ~ normal(mean_mu, mean_sigma);
+  sigma ~ inv_chi_square(mean_sigma);
+  // likelihood
+  y ~ normal(mu, sigma);
+}
+generated quantities {
+  real ypred;
+  
+  // Distribution based on all seasons
+  ypred = normal_rng(mu, sigma);
+}
+
+```
 
 
 # Running of stan model
@@ -137,46 +169,26 @@ hist(ham_extracted26, breaks = seq(min(ham_extracted26), max(ham_extracted26), l
      xlab="Score", ylab="Density",main="Predictive distribution of the mean hamilton the next season", 
      col="lightblue", xlim=c(0,28))
 abline(v = mean(ham_extracted), col="red", lwd=3)
+abline(v = mean(ham_extracted26), col="blue", lwd=3)
+legend(x=0.075, y=0.06, 
+       legend=c("Mean without removing data","Mean with removing data"),
+       col=c("red", "blue"), lty=1)
 
 ```
 
-Since the values of this normal distribution,
-
-```{r}
+```{r, echo=FALSE}
 d = density(ham_extracted26)
 plot(d, xlim=c(0,28), main="Density plot of the mean hamilton the next season")
 abline(v = mean(ham_extracted), col="red", lwd=3, xlab="")
+abline(v = mean(ham_extracted), col="red", lwd=3)
+abline(v = mean(ham_extracted26), col="blue", lwd=3)
+legend(x=0.075, y=0.06, 
+       legend=c("Mean without removing data","Mean with removing data"),
+       col=c("red", "blue"), lty=1)
 ```
 
 ## Nonhierarcial model (Pooled model)
-```{stan, output.var="pool_ham"}
-data {
-  int<lower=0> N;
-  int<lower=0> J;
-  vector[N*J] y;
-  real mean_mu;
-  real<lower=0> mean_sigma;
-  
-}
-parameters {
-  real mu;
-  real<lower=0> sigma;
-}
-model {
-  // prior
-  mu ~ normal(mean_mu, mean_sigma);
-  sigma ~ inv_chi_square(mean_sigma);
-  // likelihood
-  y ~ normal(mu, sigma);
-}
-generated quantities {
-  real ypred;
-  
-  // Distribution based on all seasons
-  ypred = normal_rng(mu, sigma);
-}
 
-```
 
 ```{r}
 pool_data = list(
@@ -195,33 +207,61 @@ pool_fit = sampling(
   warmup = 1000,
   refresh = 0
 )
+```
+
+```{r, echo=FALSE}
 ham_pool_extracted = extract(pool_fit)$ypred
 ham_pool_extracted26 = ham_pool_extracted[ham_pool_extracted <= 26]
-ham_pool_extracted26 = density(ham_pool_extracted26)
 
-plot(
-  ham_pool_extracted26, 
-  xlab="",
-  ylab="Density",
-  main="Predictive distribution of the mean hamilton the next season", 
-  col="black",
-  
-  xlim=c(0,26),
-)
+hist(ham_pool_extracted26, breaks = seq(min(ham_pool_extracted26), max(ham_pool_extracted26), length.out = 30), 
+     xlab="Score", ylab="Density",main="Predictive distribution of the mean hamilton the next season", 
+     col="lightblue", xlim=c(0,28))
 
+abline(v = mean(ham_extracted), col="red", lwd=3)
+abline(v = mean(ham_extracted26), col="blue", lwd=3)
+legend(x=0.075, y=0.06, 
+       legend=c("Mean without removing data","Mean with removing data"),
+       col=c("red", "blue"), lty=1)
 ```
+
+```{r, echo=FALSE}
+d = density(ham_pool_extracted26)
+plot(d, xlim=c(0,28), main="Density plot of the mean hamilton the next season")
+abline(v = mean(ham_pool_extracted), col="red", lwd=3)
+abline(v = mean(ham_pool_extracted26), col="blue", lwd=3)
+legend(x=0.075, y=0.06, 
+       legend=c("Mean without removing data","Mean with removing data"),
+       col=c("red", "blue"), lty=1)
+```
+
+Since the values of these normal distributions, go beyond the max points, i.e. 26, we have limited them a bit. We still plot the mean of both the limited and unlimited data. As can be seen, there isn't a lot of difference, however, over several races, this difference can be quite large. Below is also the histogram as a density plot.
 
 # Convergence diagnostics
 
-```{r}
-hier_extracted = extract_log_lik(hier_fit, merge_chains = FALSE)
-r_eff = relative_eff(exp(hier_extracted))
-hier_loo = loo(hier_extracted, r_eff = r_eff)
-hier_elpd = hier_loo$estimates["elpd_loo",1]
-hier_loo
-paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
-plot(hier_loo)
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#mean(monitor(hier_fit)[["Tail_ESS"]][1:113])
+hier_monitor = data.frame(monitor(hier_fit), print=FALSE)
+pool_monitor = data.frame(monitor(pool_fit), print=FALSE)
+
+r_hier_mean = mean(summary(hier_fit)$summary[1:113,10])
+r_pool_mean = mean(summary(pool_fit)$summary[1:3,10])
+
 ```
+The $\widehat{R}$ for our fits are as follows:
+
+* Hierarchical model: `r round(r_hier_mean, 2)`
+* Pooled model: `r round(r_pool_mean, 2)`
+
+Since these $\widehat{R}$ values are under 1.05, the chains have most likely mixed well.
+
+Another convergence diagnostic we can look at is the ESS value we get out of the fits.
+
+* Bulk ESS of the hierarchical model: `r mean(hier_monitor[["Bulk_ESS"]][1:113])`
+* Tail ESS of the hierarchical model: `r mean(hier_monitor[["Tail_ESS"]][1:113])` 
+* Bulk ESS of the pooled model: `r mean(pool_monitor[["Bulk_ESS"]][1:3])`
+* Tail ESS of the pooled model: `r mean(pool_monitor[["Tail_ESS"]][1:3])`
+
+These ESS values measure the cruse effective sample sice for the bulk and tail quantities. A value over 100 is good and all of our values are over it.
 
 
 # Posterior predictive checks
@@ -296,6 +336,7 @@ abline(v = 381, col="red", lwd=3)
 
 # Sensitivity analysis
 
+
 # Model comparison
 
 ```{r}
@@ -322,6 +363,13 @@ ggplot(
   0,
   26
 )
+
+hier_extracted = extract_log_lik(hier_fit, merge_chains = FALSE)
+r_eff = relative_eff(exp(hier_extracted))
+hier_loo = loo(hier_extracted, r_eff = r_eff)
+hier_elpd = hier_loo$estimates["elpd_loo",1]
+paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
+plot(hier_loo)
 ```
 
 # Discussion of issues and potential improvements
