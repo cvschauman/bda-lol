@@ -21,7 +21,7 @@ ham_data = read.csv("ham_data.csv", header=FALSE)
 
 # Introduction
 
-For this project, we are trying to predict Lewis Hamilton's average score in a season based on previous years scores. This is mostly just due to our curiosity if we are able to use this to somehow predict the score.   
+For this project, we are trying to predict Lewis Hamilton's average score in a season based on previous years scores. This is mostly just due to our curiosity if we are able to use this to somehow predict the score.\
 We are modeling his scores from five years, and trying to build a model using it. We want to see what kind of distribution the answer will be and how well it is able to estimate the following year. There are many factors we don't take into consideration, but we hope to see relatively good results and predictions.
 
 # Description of the data
@@ -53,10 +53,7 @@ legend(
 
 # Description of models
 
-
 # Priors used
-
-
 
 # Rstan code
 
@@ -134,7 +131,6 @@ generated quantities {
 
 ```
 
-
 # Running of stan model
 
 ## Hierarchical model
@@ -177,18 +173,22 @@ legend(x=0.075, y=0.06,
 ```
 
 ```{r, echo=FALSE}
-d = density(ham_extracted26)
-plot(d, xlim=c(0,28), main="Density plot of the mean hamilton the next season")
+ham_extracted_density = density(ham_extracted26)
+plot(
+  ham_extracted_density, xlim=c(0,28),
+  main="Density plot of the mean hamilton the next season"
+)
 abline(v = mean(ham_extracted), col="red", lwd=3, xlab="")
 abline(v = mean(ham_extracted), col="red", lwd=3)
 abline(v = mean(ham_extracted26), col="blue", lwd=3)
-legend(x=0.075, y=0.06, 
-       legend=c("Mean without removing data","Mean with removing data"),
-       col=c("red", "blue"), lty=1)
+legend(
+  x=0.075, y=0.06, 
+  legend=c("Mean without removing data","Mean with removing data"),
+  col=c("red", "blue"), lty=1
+)
 ```
 
 ## Nonhierarcial model (Pooled model)
-
 
 ```{r}
 pool_data = list(
@@ -225,13 +225,18 @@ legend(x=0.075, y=0.06,
 ```
 
 ```{r, echo=FALSE}
-d = density(ham_pool_extracted26)
-plot(d, xlim=c(0,28), main="Density plot of the mean hamilton the next season")
+ham_pool_extracted_density = density(ham_pool_extracted26)
+plot(
+  ham_pool_extracted_density,
+  xlim=c(0,28), main="Density plot of the mean hamilton the next season"
+)
 abline(v = mean(ham_pool_extracted), col="red", lwd=3)
 abline(v = mean(ham_pool_extracted26), col="blue", lwd=3)
-legend(x=0.075, y=0.06, 
-       legend=c("Mean without removing data","Mean with removing data"),
-       col=c("red", "blue"), lty=1)
+legend(
+  x=0.075, y=0.06, 
+  legend=c("Mean without removing data","Mean with removing data"),
+  col=c("red", "blue"), lty=1
+)
 ```
 
 Since the values of these normal distributions, go beyond the max points, i.e. 26, we have limited them a bit. We still plot the mean of both the limited and unlimited data. As can be seen, there isn't a lot of difference, however, over several races, this difference can be quite large. Below is also the histogram as a density plot.
@@ -247,22 +252,22 @@ r_hier_mean = mean(summary(hier_fit)$summary[1:113,10])
 r_pool_mean = mean(summary(pool_fit)$summary[1:3,10])
 
 ```
+
 The $\widehat{R}$ for our fits are as follows:
 
-* Hierarchical model: `r round(r_hier_mean, 2)`
-* Pooled model: `r round(r_pool_mean, 2)`
+-   Hierarchical model: `r round(r_hier_mean, 2)`
+-   Pooled model: `r round(r_pool_mean, 2)`
 
 Since these $\widehat{R}$ values are under 1.05, the chains have most likely mixed well.
 
 Another convergence diagnostic we can look at is the ESS value we get out of the fits.
 
-* Bulk ESS of the hierarchical model: `r mean(hier_monitor[["Bulk_ESS"]][1:113])`
-* Tail ESS of the hierarchical model: `r mean(hier_monitor[["Tail_ESS"]][1:113])` 
-* Bulk ESS of the pooled model: `r mean(pool_monitor[["Bulk_ESS"]][1:3])`
-* Tail ESS of the pooled model: `r mean(pool_monitor[["Tail_ESS"]][1:3])`
+-   Bulk ESS of the hierarchical model: `r mean(hier_monitor[["Bulk_ESS"]][1:113])`
+-   Tail ESS of the hierarchical model: `r mean(hier_monitor[["Tail_ESS"]][1:113])`
+-   Bulk ESS of the pooled model: `r mean(pool_monitor[["Bulk_ESS"]][1:3])`
+-   Tail ESS of the pooled model: `r mean(pool_monitor[["Tail_ESS"]][1:3])`
 
 These ESS values measure the cruse effective sample sice for the bulk and tail quantities. A value over 100 is good and all of our values are over it.
-
 
 # Posterior predictive checks
 
@@ -282,7 +287,7 @@ To assess the performance of the models we simulate 1000 seasons with the help o
 pool_season_preditcions = c()
 
 for(i in 1:1000) {
-  dens = ham_pool_extracted26
+  dens = ham_pool_extracted_density
   N <- 21
   newx <- sample(x = dens$x, N,
        prob = dens$y, replace=TRUE)
@@ -310,7 +315,7 @@ abline(v = 381, col="red", lwd=3)
 hier_season_preditcions = c()
 
 for(i in 1:1000) {
-  dens = d
+  dens = ham_extracted_density
   N <- 21
   newx <- sample(x = dens$x, N,
        prob = dens$y, replace=TRUE)
@@ -335,7 +340,6 @@ abline(v = 381, col="red", lwd=3)
 ```
 
 # Sensitivity analysis
-
 
 # Model comparison
 
