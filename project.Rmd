@@ -64,7 +64,6 @@ Below is the code for the hierarchical model for Hamilton's points.
 data {
   int<lower=0> N;
   int<lower=0> J;
-  real U;
   vector[J] y[N];
   real<lower=0> mu_s;
   real<lower=0> sigma_prior;
@@ -80,9 +79,8 @@ parameters {
 model {
   mu ~ normal(0, mu_s);
   tau ~ inv_chi_square(sigma_prior);
-  sigma ~ inv_chi_square(tau);
+  sigma ~ gamma(1,1);
   mus ~ normal(mu, tau);
-  
   for (j in 1:J)
     y[,j] ~ normal(mus[j], sigma);
 }
@@ -105,7 +103,9 @@ generated quantities {
 
 # Running of stan model
 
-Below is the hierarchical model with the corresponding histogram with the data.
+## Hierarchical model
+
+Below is the hierarchical model run with the corresponding histogram with the data.
 
 ```{r}
 hier_data = list(
@@ -125,15 +125,27 @@ hier_fit = sampling(
   warmup = 1000,
   refresh = 0
 )
+```
 
+```{r, echo=FALSE}
 ham_extracted = extract(hier_fit)$ypred
 ham_extracted26 = ham_extracted[ham_extracted < 26]
 
 hist(ham_extracted26, breaks = seq(min(ham_extracted26), max(ham_extracted26), length.out = 30), 
-     xlab="", ylab="Density",main="Predictive distribution of the mean hamilton the next season", 
+     xlab="Score", ylab="Density",main="Predictive distribution of the mean hamilton the next season", 
      col="lightblue", xlim=c(0,28))
+abline(v = mean(ham_extracted), col="red", lwd=3)
 
 ```
+
+Since the values of this normal distribution,
+
+```{r}
+d = density(ham_extracted26)
+plot(d, xlim=c(0,28), main="Density plot of the mean hamilton the next season")
+abline(v = mean(ham_extracted), col="red", lwd=3, xlab="")
+```
+
 
 # Convergence diagnostics
 
@@ -146,6 +158,7 @@ hier_loo
 paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
 plot(hier_loo)
 ```
+
 
 # Posterior predictive checks
 
