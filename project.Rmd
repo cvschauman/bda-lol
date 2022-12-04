@@ -341,15 +341,20 @@ hist(
   col="lightblue",
   xlim=c(200,450)
 )
-abline(v = 413, col="red", lwd=3)
+abline(v = 413, col="black", lwd=3)
 abline(v = 408, col="red", lwd=3)
-abline(v = 363, col="red", lwd=3)
-abline(v = 380, col="red", lwd=3)
-abline(v = 381, col="red", lwd=3)
+abline(v = 363, col="blue", lwd=3)
+abline(v = 380, col="yellow", lwd=3)
+abline(v = 381, col="green", lwd=3)
+legend(
+  x=200, y=80,
+  cex=0.75, 
+  legend=c("2015", "2016", "2017", "2018", "2019"),
+  col=c("black", "red", "blue", "yellow", "green"), lty=1
+)
 ```
 
 ```{r, echo=FALSE}
-
 hist(
   hier_season_predictions,
   breaks = seq(min(hier_season_predictions),
@@ -359,12 +364,20 @@ hist(
   col="lightblue",
   xlim=c(200,450)
 )
-abline(v = 413, col="red", lwd=3)
+abline(v = 413, col="black", lwd=3)
 abline(v = 408, col="red", lwd=3)
-abline(v = 363, col="red", lwd=3)
-abline(v = 380, col="red", lwd=3)
-abline(v = 381, col="red", lwd=3)
+abline(v = 363, col="blue", lwd=3)
+abline(v = 380, col="yellow", lwd=3)
+abline(v = 381, col="green", lwd=3)
+legend(
+  x=200, y=80,
+  cex=0.75, 
+  legend=c("2015", "2016", "2017", "2018", "2019"),
+  col=c("black", "red", "blue", "yellow", "green"), lty=1
+)
 ```
+
+When comparing the simulated data with the actual real world data we can see that it is in the right ball park, but slightly of.
 
 # Sensitivity analysis
 
