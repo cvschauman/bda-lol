@@ -55,17 +55,17 @@ legend(
 
 # Priors used
 
-For our parameters $\mu$ and $\sigma$ we used weekly informative priors based on the apperance of the data. The final priors chosen where the following:
+For our parameters $\mu$ and $\sigma$ we used weekly informative priors based on the appearance of the data. The final priors chosen where the following:
 
 Hierarchical Model:
 
-  $\mu = 20$
-  $\sigma = 7$
+$\mu_{hyperprior} = 20$\  
+$\sigma_{hyperprior} = 7$\  
 
 Pooled Model:
 
-  $\mu = 20$
-  $\sigma = 7$
+$\mu_{prior} = 20$\  
+$\sigma_{prior} = 7$  
 
 # Rstan code
 
@@ -116,7 +116,7 @@ generated quantities {
 }
 ```
 
-## Non-hierarchical stan model
+## Pooled stan model
 
 ```{stan, output.var="pool_ham"}
 data {
