@@ -28,7 +28,7 @@ We are modeling his scores from five years, and trying to build a model using it
 
 The data we use is from Kaggle and can be found [here](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020). We took Lewis Hamilton out of the data and chose the years 2015-2019. We selected his scores from all the races from those years. One thing to note with the data is that every year doesn't have an equal amount of races. To account for this we chose to fill in the missing races with the median for the year. This makes the data a bit inaccurate, however, it shouldn't have too big an effect on the data.
 
-```{r, echo=FALSE, fig.cap="The cumulative points Hamilton got during the seasons 2015-2019."}
+```{r, echo=FALSE}
 num_races = seq(1, 21, by=1)
 l <- as.list(as.data.frame(ham_data))
 #print(l)
@@ -157,7 +157,7 @@ hier_fit = sampling(
 )
 ```
 
-```{r, echo=FALSE, fig.cap="Histograms of mean score with mean lines for limited and unlimited sample."}
+```{r, echo=FALSE}
 ham_extracted = extract(hier_fit)$ypred
 ham_extracted26 = ham_extracted[ham_extracted < 26]
 
@@ -172,7 +172,7 @@ legend(x=0.05, y=225, cex=0.75,
 
 ```
 
-```{r, echo=FALSE,fig.cap="Density plot of mean score with mean lines for limited and unlimited sample."}
+```{r, echo=FALSE}
 ham_extracted_density = density(ham_extracted26)
 plot(
   ham_extracted_density, xlim=c(0,28),
@@ -209,7 +209,7 @@ pool_fit = sampling(
 )
 ```
 
-```{r, echo=FALSE,fig.cap="Histograms of mean score with mean lines for limited and unlimited sample."}
+```{r, echo=FALSE}
 ham_pool_extracted = extract(pool_fit)$ypred
 ham_pool_extracted26 = ham_pool_extracted[ham_pool_extracted <= 26]
 
@@ -226,7 +226,7 @@ legend(
 )
 ```
 
-```{r, echo=FALSE,fig.cap="Density plot of mean score with mean lines for limited and unlimited sample."}
+```{r, echo=FALSE}
 ham_pool_extracted_density = density(ham_pool_extracted26)
 plot(
   ham_pool_extracted_density,
@@ -275,7 +275,7 @@ These ESS values measure the cruse effective sample sice for the bulk and tail q
 
 Below are the traceplots 
 
-```{r, echo=FALSE, fig.cap="Trace plot of the hierarchical model."}
+```{r, echo=FALSE}
 traceplot(
   hier_fit,
   nrow=4,
@@ -284,7 +284,7 @@ traceplot(
 )
 ```
 
-```{r, echo=FALSE, fig.cap="Trace plot of the nonhierarchical model."}
+```{r, echo=FALSE}
 traceplot(
   pool_fit,
   nrow=3,
