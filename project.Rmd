@@ -415,6 +415,89 @@ When comparing the simulated data with the actual real world data we can see tha
 
 # Sensitivity analysis
 
+To test the sensitivity of the model we use different combinations of small and large values of $\mu$ and $\sigma$. The chosen values are \[1, 100, 1000\].
+
+```{r}
+sensitivity_mu = c(1, 100, 1000)
+sensitivity_sigma = c(1, 100, 1000)
+
+fits = list()
+
+for (i in sensitivity_mu) {
+  for (j in sensitivity_sigma) {
+    sensitivity_data = list(
+      y = unlist(ham_data),
+      N = nrow(ham_data),
+      J = ncol(ham_data),
+      mean_mu = i,
+      mean_sigma = j
+    )
+    
+    sensitivity_fit = sampling(
+      pool_ham,
+      data = sensitivity_data,
+      chains = 4,
+      iter = 2000,
+      warmup = 1000,
+      refresh = 0
+    )
+    
+    fits <- append(fits, list(sensitivity_fit, paste0(i, "-", j)))
+  }
+}
+
+```
+
+```{r, echo=FALSE}
+c_colors = c(
+  "#9400D3",
+  "#4B0082",
+  "#add8e6",
+  "#0000FF",
+  "#00FF00",
+  "#FFFF00",
+  "#FF7F00",
+  "#FF0000",
+  "pink"
+)
+c_legend = c()
+
+first=TRUE
+
+for(i in 1:9) {
+  k = i * 2
+  j = k - 1
+  
+  y_pred <- extract(fits[[j]])$ypred
+  d <- density(y_pred)
+  
+  if (first) {
+    plot(
+      d,
+      xlim = c(-25, 50),
+      ylim = c(0, 0.2),
+      xlab="Points",
+      main = "Sensitivity plot",
+      col = c_colors[i],
+      lwd=3
+    )
+    first=FALSE
+  } else {
+    lines(
+      d,
+      col=c_colors[i]
+    )
+  }
+  
+  c_legend <- c(c_legend, fits[[k]])
+}
+
+legend(
+  x=-24, y=0.2, 
+  legend=c_legend,
+  col=c_colors, lty=1)
+```
+
 # Model comparison
 
 Our models compared to each other in one graph looks like this. As we can see, they are relatively similar. To check performance and comparing them, we will also use PSIS-LOO values.
