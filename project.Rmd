@@ -226,7 +226,73 @@ plot(hier_loo)
 
 # Posterior predictive checks
 
-# Predictive performance assessment 
+# Predictive performance assessment
+
+To assess the performance of the models we simulate 1000 seasons with the help of our models and compare the outcomes with the real world data.
+
+| Year | Driver   | Points |
+|------|----------|--------|
+| 2015 | Hamilton | 413    |
+| 2016 | Hamilton | 408    |
+| 2017 | Hamilton | 363    |
+| 2018 | Hamilton | 380    |
+| 2019 | Hamilton | 381    |
+
+```{r}
+pool_season_preditcions = c()
+
+for(i in 1:1000) {
+  dens = ham_pool_extracted26
+  N <- 21
+  newx <- sample(x = dens$x, N,
+       prob = dens$y, replace=TRUE)
+    + rnorm(N, 0, dens$bw)
+  pool_season_preditcions <- append(pool_season_preditcions, sum(newx))
+}
+
+hist(
+  pool_season_preditcions,
+  breaks = seq(min(pool_season_preditcions),
+               max(pool_season_preditcions),
+               length.out = 30
+            ),
+  col="lightblue",
+  xlim=c(200,450)
+)
+abline(v = 413, col="red", lwd=3)
+abline(v = 408, col="red", lwd=3)
+abline(v = 363, col="red", lwd=3)
+abline(v = 380, col="red", lwd=3)
+abline(v = 381, col="red", lwd=3)
+```
+
+```{r}
+hier_season_preditcions = c()
+
+for(i in 1:1000) {
+  dens = d
+  N <- 21
+  newx <- sample(x = dens$x, N,
+       prob = dens$y, replace=TRUE)
+    + rnorm(N, 0, dens$bw)
+  hier_season_preditcions <- append(hier_season_preditcions, sum(newx))
+}
+
+hist(
+  hier_season_preditcions,
+  breaks = seq(min(hier_season_preditcions),
+               max(hier_season_preditcions),
+               length.out = 30
+            ),
+  col="lightblue",
+  xlim=c(200,450)
+)
+abline(v = 413, col="red", lwd=3)
+abline(v = 408, col="red", lwd=3)
+abline(v = 363, col="red", lwd=3)
+abline(v = 380, col="red", lwd=3)
+abline(v = 381, col="red", lwd=3)
+```
 
 # Sensitivity analysis
 
