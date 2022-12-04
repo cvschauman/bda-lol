@@ -55,6 +55,18 @@ legend(
 
 # Priors used
 
+For our parameters $\mu$ and $\sigma$ we used weekly informative priors based on the apperance of the data. The final priors chosen where the following:
+
+Hierarchical Model:
+
+  $\mu = 20$
+  $\sigma = 7$
+
+Pooled Model:
+
+  $\mu = 20$
+  $\sigma = 7$
+
 # Rstan code
 
 ## Hierarchical stan model
@@ -191,7 +203,7 @@ legend(
 )
 ```
 
-## Nonhierarcial model (Pooled model)
+## Pooled model
 
 ```{r, warning=FALSE}
 pool_data = list(
