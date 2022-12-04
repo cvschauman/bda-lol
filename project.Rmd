@@ -28,10 +28,10 @@ We are modeling his scores from five years, and trying to build a model using it
 
 The data we use is from Kaggle and can be found [here](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020). We took Lewis Hamilton out of the data and chose the years 2015-2019. We selected his scores from all the races from those years. One thing to note with the data is that every year doesn't have an equal amount of races. To account for this we chose to fill in the missing races with the median for the year. This makes the data a bit inaccurate, however, it shouldn't have too big an effect on the data.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="The cumulative points Hamilton got during the seasons 2015-2019."}
 num_races = seq(1, 21, by=1)
 l <- as.list(as.data.frame(ham_data))
-print(l)
+#print(l)
 cum_sums <- list()
 for (i in l) {
   cum_sums[length(cum_sums)+1] <- list(cumsum(i[1:21]))
@@ -137,7 +137,7 @@ generated quantities {
 
 Below is the hierarchical model run with the corresponding histogram with the data.
 
-```{r}
+```{r, warning=FALSE}
 hier_data = list(
   y = ham_data,
   N = nrow(ham_data),
@@ -157,7 +157,7 @@ hier_fit = sampling(
 )
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Histograms of mean score with mean lines for limited and unlimited sample."}
 ham_extracted = extract(hier_fit)$ypred
 ham_extracted26 = ham_extracted[ham_extracted < 26]
 
@@ -166,13 +166,13 @@ hist(ham_extracted26, breaks = seq(min(ham_extracted26), max(ham_extracted26), l
      col="lightblue", xlim=c(0,28))
 abline(v = mean(ham_extracted), col="red", lwd=3)
 abline(v = mean(ham_extracted26), col="blue", lwd=3)
-legend(x=0.075, y=0.06, 
+legend(x=0.05, y=225, cex=0.75, 
        legend=c("Mean without removing data","Mean with removing data"),
        col=c("red", "blue"), lty=1)
 
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,fig.cap="Density plot of mean score with mean lines for limited and unlimited sample."}
 ham_extracted_density = density(ham_extracted26)
 plot(
   ham_extracted_density, xlim=c(0,28),
@@ -182,7 +182,7 @@ abline(v = mean(ham_extracted), col="red", lwd=3, xlab="")
 abline(v = mean(ham_extracted), col="red", lwd=3)
 abline(v = mean(ham_extracted26), col="blue", lwd=3)
 legend(
-  x=0.075, y=0.06, 
+  x=0.075, y=0.065, cex=0.75,
   legend=c("Mean without removing data","Mean with removing data"),
   col=c("red", "blue"), lty=1
 )
@@ -190,7 +190,7 @@ legend(
 
 ## Nonhierarcial model (Pooled model)
 
-```{r}
+```{r, warning=FALSE}
 pool_data = list(
   y = unlist(ham_data),
   N = nrow(ham_data),
@@ -209,7 +209,7 @@ pool_fit = sampling(
 )
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,fig.cap="Histograms of mean score with mean lines for limited and unlimited sample."}
 ham_pool_extracted = extract(pool_fit)$ypred
 ham_pool_extracted26 = ham_pool_extracted[ham_pool_extracted <= 26]
 
@@ -219,12 +219,14 @@ hist(ham_pool_extracted26, breaks = seq(min(ham_pool_extracted26), max(ham_pool_
 
 abline(v = mean(ham_extracted), col="red", lwd=3)
 abline(v = mean(ham_extracted26), col="blue", lwd=3)
-legend(x=0.075, y=0.06, 
-       legend=c("Mean without removing data","Mean with removing data"),
-       col=c("red", "blue"), lty=1)
+legend(
+  x=0.05, y=225, cex=0.75,
+  legend=c("Mean without removing data","Mean with removing data"),
+  col=c("red", "blue"), lty=1
+)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,fig.cap="Density plot of mean score with mean lines for limited and unlimited sample."}
 ham_pool_extracted_density = density(ham_pool_extracted26)
 plot(
   ham_pool_extracted_density,
@@ -233,7 +235,7 @@ plot(
 abline(v = mean(ham_pool_extracted), col="red", lwd=3)
 abline(v = mean(ham_pool_extracted26), col="blue", lwd=3)
 legend(
-  x=0.075, y=0.06, 
+  x=0.075, y=0.065, cex=0.75,
   legend=c("Mean without removing data","Mean with removing data"),
   col=c("red", "blue"), lty=1
 )
@@ -241,12 +243,14 @@ legend(
 
 Since the values of these normal distributions, go beyond the max points, i.e. 26, we have limited them a bit. We still plot the mean of both the limited and unlimited data. As can be seen, there isn't a lot of difference, however, over several races, this difference can be quite large. Below is also the histogram as a density plot.
 
+\newpage
+
 # Convergence diagnostics
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 #mean(monitor(hier_fit)[["Tail_ESS"]][1:113])
-hier_monitor = data.frame(monitor(hier_fit), print=FALSE)
-pool_monitor = data.frame(monitor(pool_fit), print=FALSE)
+hier_monitor = data.frame(monitor(hier_fit, print=FALSE))
+pool_monitor = data.frame(monitor(pool_fit, print=FALSE))
 
 r_hier_mean = mean(summary(hier_fit)$summary[1:113,10])
 r_pool_mean = mean(summary(pool_fit)$summary[1:3,10])
@@ -262,14 +266,16 @@ Since these $\widehat{R}$ values are under 1.05, the chains have most likely mix
 
 Another convergence diagnostic we can look at is the ESS value we get out of the fits.
 
--   Bulk ESS of the hierarchical model: `r mean(hier_monitor[["Bulk_ESS"]][1:113])`
--   Tail ESS of the hierarchical model: `r mean(hier_monitor[["Tail_ESS"]][1:113])`
--   Bulk ESS of the pooled model: `r mean(pool_monitor[["Bulk_ESS"]][1:3])`
--   Tail ESS of the pooled model: `r mean(pool_monitor[["Tail_ESS"]][1:3])`
+-   Bulk ESS of the hierarchical model: `r round(mean(hier_monitor[["Bulk_ESS"]][1:113]),2)`
+-   Tail ESS of the hierarchical model: `r round(mean(hier_monitor[["Tail_ESS"]][1:113]),2)`
+-   Bulk ESS of the pooled model: `r round(mean(pool_monitor[["Bulk_ESS"]][1:3]),2)`
+-   Tail ESS of the pooled model: `r round(mean(pool_monitor[["Tail_ESS"]][1:3]),2)`
 
-These ESS values measure the cruse effective sample sice for the bulk and tail quantities. A value over 100 is good and all of our values are over it.
+These ESS values measure the cruse effective sample sice for the bulk and tail quantities. A value over 100 is good and all of our values are over it.  
 
-```{r}
+Below are the traceplots 
+
+```{r, echo=FALSE, fig.cap="Trace plot of the hierarchical model."}
 traceplot(
   hier_fit,
   nrow=4,
@@ -278,7 +284,7 @@ traceplot(
 )
 ```
 
-```{r}
+```{r, echo=FALSE, fig.cap="Trace plot of the nonhierarchical model."}
 traceplot(
   pool_fit,
   nrow=3,
@@ -302,7 +308,10 @@ To assess the performance of the models we simulate 1000 seasons with the help o
 | 2019 | Hamilton | 381    |
 
 ```{r}
-pool_season_preditcions = c()
+# Code for simulating 1000 seasons
+
+pool_season_predictions = c()
+hier_season_predictions = c()
 
 for(i in 1:1000) {
   dens = ham_pool_extracted_density
@@ -310,13 +319,24 @@ for(i in 1:1000) {
   newx <- sample(x = dens$x, N,
        prob = dens$y, replace=TRUE)
     + rnorm(N, 0, dens$bw)
-  pool_season_preditcions <- append(pool_season_preditcions, sum(newx))
+  pool_season_predictions <- append(pool_season_predictions, sum(newx))
 }
 
+for(i in 1:1000) {
+  dens = ham_extracted_density
+  N <- 21
+  newx <- sample(x = dens$x, N,
+       prob = dens$y, replace=TRUE)
+    + rnorm(N, 0, dens$bw)
+  hier_season_predictions <- append(hier_season_predictions, sum(newx))
+}
+```
+
+```{r, echo=FALSE}
 hist(
-  pool_season_preditcions,
-  breaks = seq(min(pool_season_preditcions),
-               max(pool_season_preditcions),
+  pool_season_predictions,
+  breaks = seq(min(pool_season_predictions),
+               max(pool_season_predictions),
                length.out = 30
             ),
   col="lightblue",
@@ -329,22 +349,12 @@ abline(v = 380, col="red", lwd=3)
 abline(v = 381, col="red", lwd=3)
 ```
 
-```{r}
-hier_season_preditcions = c()
-
-for(i in 1:1000) {
-  dens = ham_extracted_density
-  N <- 21
-  newx <- sample(x = dens$x, N,
-       prob = dens$y, replace=TRUE)
-    + rnorm(N, 0, dens$bw)
-  hier_season_preditcions <- append(hier_season_preditcions, sum(newx))
-}
+```{r, echo=FALSE}
 
 hist(
-  hier_season_preditcions,
-  breaks = seq(min(hier_season_preditcions),
-               max(hier_season_preditcions),
+  hier_season_predictions,
+  breaks = seq(min(hier_season_predictions),
+               max(hier_season_predictions),
                length.out = 30
             ),
   col="lightblue",
@@ -361,7 +371,7 @@ abline(v = 381, col="red", lwd=3)
 
 # Model comparison
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 df <- data.frame(ham_pool_extracted, ham_extracted)
 colnames(df) <- c("points_pool", "points_hier")
 ggplot(
@@ -390,7 +400,7 @@ hier_extracted = extract_log_lik(hier_fit, merge_chains = FALSE)
 r_eff = relative_eff(exp(hier_extracted))
 hier_loo = loo(hier_extracted, r_eff = r_eff)
 hier_elpd = hier_loo$estimates["elpd_loo",1]
-paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
+#paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
 plot(hier_loo)
 ```
 
