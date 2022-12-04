@@ -405,6 +405,10 @@ plot(hier_loo)
 
 # Discussion of issues and potential improvements
 
+Our problem to begin with is almost impossible to model correctly since F1 is dependent on so many different parameters. Who you are driving for, the current regulations and the engineering of the car are all important factors that the drivers can not simply affect in any way. The choice to model the data based on a normal distribution might also have been a bad idea since our rstan model is also predicting out values that are negative and larger than 26 (max points from one race). Lastly the data used had minor inconsistencies with number of races each season. 2015 had 2 less races and 2017 1 less. To make it easier for us we filled in the missing values with the mean score of the season.
+
+In our project we decided to look at the results of an individual driver, but it might have also been a good idea to look at results of teams instead. However by looking at team results we just get different inconsistencies such as who is driving for the team and what their current form is. An other idea for improvements is to look at more parameters than just the points scored e.g. positions in qualifying and point difference between teammates.
+
 # Conclusion what was learned from the data analysis
 
 # Self-reflection
