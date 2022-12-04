@@ -140,9 +140,13 @@ model {
 }
 generated quantities {
   real ypred;
+  vector[N*J] log_lik;
   
   // Distribution based on all seasons
   ypred = normal_rng(mu, sigma);
+  for (jn in 1:J*N){
+    log_lik[jn] = normal_lpdf(y[jn] | mu, sigma);
+  }
 }
 
 ```
@@ -268,7 +272,7 @@ hier_monitor = data.frame(monitor(hier_fit, print=FALSE))
 pool_monitor = data.frame(monitor(pool_fit, print=FALSE))
 
 r_hier_mean = mean(summary(hier_fit)$summary[1:113,10])
-r_pool_mean = mean(summary(pool_fit)$summary[1:3,10])
+r_pool_mean = mean(summary(pool_fit)$summary[1:108,10])
 
 ```
 
@@ -427,17 +431,34 @@ ggplot(
 )
 ```
 
-```{r}
+## Hierarchical analysis
+
+```{r, echo=FALSE}
 hier_extracted = extract_log_lik(hier_fit, merge_chains = FALSE)
 r_eff = relative_eff(exp(hier_extracted))
 hier_loo = loo(hier_extracted, r_eff = r_eff)
-hier_elpd = hier_loo$estimates["elpd_loo",1]
-paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
-hier_loo
 plot(hier_loo)
+knitr::kable(hier_loo$estimates)
 ```
 
+As can be seen, all of our k values are under 0.5, which means they are all good, and our PSIS-LOO estimate can be considered reliable.
 
+## Nonhierarchical analysis
+
+```{r, echo=FALSE}
+pool_extracted = extract_log_lik(pool_fit, merge_chains = FALSE)
+r_eff = relative_eff(exp(pool_extracted))
+pool_loo = loo(pool_extracted, r_eff = r_eff)
+plot(pool_loo)
+knitr::kable(pool_loo$estimates)
+```
+
+Like in the previous one, all of our k values are under 0.5, which means they are all good, and our PSIS-LOO estimate can be considered reliable.
+
+```{r, echo=FALSE}
+knitr::kable(loo_compare(pool_loo, hier_loo))
+```
+Here we can once again see that the values are very close to each other, and that both models perform quite similarly to each other. This wasn't a surprise considering the first graph in this section, which shows that both are very similar.
 
 
 # Discussion of issues and potential improvements
