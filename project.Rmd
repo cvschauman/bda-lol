@@ -328,8 +328,6 @@ traceplot(
 
 # Posterior predictive checks
 
-# Predictive performance assessment
-
 To assess the performance of the models we simulate 1000 seasons with the help of our models and compare the outcomes with the real world data.
 
 | Year | Driver   | Points |
@@ -412,6 +410,20 @@ legend(
 ```
 
 When comparing the simulated data with the actual real world data we can see that it is in the right ball park, but slightly of.
+
+# Predictive performance assessment
+
+
+To assess the predictive performance of our model we look at the results from 2020-2022.
+
+| Year | Driver   | Points |
+|------|----------|--------|
+| 2020 | Hamilton | 347    |
+| 2021 | Hamilton | 387.5  |
+| 2022 | Hamilton | 240    |
+
+When comparing the above results to the simulated once we can see that our simulated points are well within our estimations. However the last seasons result is not even in our simulated distribution. This speaks loudly about how unpredictable F1 is.
+
 
 # Sensitivity analysis
 
