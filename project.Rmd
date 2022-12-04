@@ -146,6 +146,68 @@ plot(d, xlim=c(0,28), main="Density plot of the mean hamilton the next season")
 abline(v = mean(ham_extracted), col="red", lwd=3, xlab="")
 ```
 
+## Nonhierarcial model (Pooled model)
+```{stan, output.var="pool_ham"}
+data {
+  int<lower=0> N;
+  int<lower=0> J;
+  vector[N*J] y;
+  real mean_mu;
+  real<lower=0> mean_sigma;
+  
+}
+parameters {
+  real mu;
+  real<lower=0> sigma;
+}
+model {
+  // prior
+  mu ~ normal(mean_mu, mean_sigma);
+  sigma ~ inv_chi_square(mean_sigma);
+  // likelihood
+  y ~ normal(mu, sigma);
+}
+generated quantities {
+  real ypred;
+  
+  // Distribution based on all seasons
+  ypred = normal_rng(mu, sigma);
+}
+
+```
+
+```{r}
+pool_data = list(
+  y = unlist(ham_data),
+  N = nrow(ham_data),
+  J = ncol(ham_data),
+  mean_mu = 18,
+  mean_sigma = 6
+)
+
+pool_fit = sampling(
+  pool_ham,
+  data = pool_data,
+  chains = 4,
+  iter = 2000,
+  warmup = 1000,
+  refresh = 0
+)
+ham_pool_extracted = extract(pool_fit)$ypred
+ham_pool_extracted26 = ham_pool_extracted[ham_pool_extracted <= 26]
+ham_pool_extracted26 = density(ham_pool_extracted26)
+
+plot(
+  ham_pool_extracted26, 
+  xlab="",
+  ylab="Density",
+  main="Predictive distribution of the mean hamilton the next season", 
+  col="black",
+  
+  xlim=c(0,26),
+)
+
+```
 
 # Convergence diagnostics
 
@@ -167,6 +229,32 @@ plot(hier_loo)
 # Sensitivity analysis
 
 # Model comparison
+
+```{r}
+df <- data.frame(ham_pool_extracted, ham_extracted)
+colnames(df) <- c("points_pool", "points_hier")
+ggplot(
+  data = df,
+  mapping = aes(x=points_pool)
+) + geom_histogram(
+  aes(x=points_pool, y=..density..),
+  binwidth = 1,
+  colour="black",
+  fill="blue",
+  position = "identity",
+  alpha = 0.4
+) + geom_histogram(
+  aes(x=points_hier, y=..density..),
+  binwidth = 1,
+  colour="black",
+  fill="green",
+  position = "identity",
+  alpha = 0.4
+) + xlim(
+  0,
+  26
+)
+```
 
 # Discussion of issues and potential improvements
 
