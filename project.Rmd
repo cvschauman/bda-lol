@@ -27,7 +27,7 @@ We are modeling his scores from five years, and trying to build a model using it
 
 # Description of the data
 
-The data we use is from Kaggle and can be found [here](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020). We took Lewis Hamilton out of the data and chose the years 2015-2019. We selected his scores from all the races from those years. One thing to note with the data is that every year doesn't have an equal amount of races. To account for this we chose to fill in the missing races with the median for the year. This makes the data a bit inaccurate, however, it shouldn't have too big an effect on the data.
+The data we use is from Kaggle and can be found [here](https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020). We took Lewis Hamilton out of the data and chose the years 2015-2019. We selected his scores from all the races from those years. One thing to note with the data is that every year doesn't have an equal amount of races. To account for this we chose to fill in the missing races with the median for the year. This makes the data a bit inaccurate, however, it shouldn't have too big an effect on the data. We couldn't find any similar analysis done before us.
 
 ```{r, echo=FALSE}
 num_races = seq(1, 21, by=1)
@@ -195,7 +195,7 @@ ham_extracted = extract(hier_fit)$ypred
 ham_extracted26 = ham_extracted[ham_extracted < 26]
 
 hist(ham_extracted26, breaks = seq(min(ham_extracted26), max(ham_extracted26), length.out = 30), 
-     xlab="Score", ylab="Density",main="Predictive distribution of the mean hamilton the next season", 
+     xlab="Score", ylab="Density",main="Predictive distribution of the mean of Hamilton's points the next season", 
      col="lightblue", xlim=c(0,28))
 abline(v = mean(ham_extracted), col="red", lwd=3)
 abline(v = mean(ham_extracted26), col="blue", lwd=3)
@@ -209,7 +209,7 @@ legend(x=0.05, y=225, cex=0.75,
 ham_extracted_density = density(ham_extracted26)
 plot(
   ham_extracted_density, xlim=c(0,28),
-  main="Density plot of the mean hamilton the next season"
+  main="Density plot of the mean of Hamilton's points the next season"
 )
 abline(v = mean(ham_extracted), col="red", lwd=3, xlab="")
 abline(v = mean(ham_extracted), col="red", lwd=3)
@@ -247,7 +247,7 @@ ham_pool_extracted = extract(pool_fit)$ypred
 ham_pool_extracted26 = ham_pool_extracted[ham_pool_extracted <= 26]
 
 hist(ham_pool_extracted26, breaks = seq(min(ham_pool_extracted26), max(ham_pool_extracted26), length.out = 30), 
-     xlab="Score", ylab="Density",main="Predictive distribution of the mean hamilton the next season", 
+     xlab="Score", ylab="Density",main="Predictive distribution of the mean of Hamilton's points the next season", 
      col="lightblue", xlim=c(0,28))
 
 abline(v = mean(ham_extracted), col="red", lwd=3)
@@ -263,7 +263,7 @@ legend(
 ham_pool_extracted_density = density(ham_pool_extracted26)
 plot(
   ham_pool_extracted_density,
-  xlim=c(0,28), main="Density plot of the mean hamilton the next season"
+  xlim=c(0,28), main="Density plot of the mean of Hamilton's points the next season"
 )
 abline(v = mean(ham_pool_extracted), col="red", lwd=3)
 abline(v = mean(ham_pool_extracted26), col="blue", lwd=3)
@@ -276,12 +276,9 @@ legend(
 
 Since the values of these normal distributions, go beyond the max points, i.e. 26, we have limited them a bit. We still plot the mean of both the limited and unlimited data. As can be seen, there isn't a lot of difference, however, over several races, this difference can be quite large. Below is also the histogram as a density plot.
 
-\newpage
-
 # Convergence diagnostics
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-#mean(monitor(hier_fit)[["Tail_ESS"]][1:113])
 hier_monitor = data.frame(monitor(hier_fit, print=FALSE))
 pool_monitor = data.frame(monitor(pool_fit, print=FALSE))
 
@@ -371,7 +368,9 @@ hist(
                length.out = 30
             ),
   col="lightblue",
-  xlim=c(200,450)
+  xlim=c(200,450),
+  main="Simulated seasons",
+  xlab="Points"
 )
 abline(v = 413, col="black", lwd=3)
 abline(v = 408, col="red", lwd=3)
@@ -394,7 +393,9 @@ hist(
                length.out = 30
             ),
   col="lightblue",
-  xlim=c(200,450)
+  xlim=c(200,450),
+  main="Simulated seasons",
+  xlab="points"
 )
 abline(v = 413, col="black", lwd=3)
 abline(v = 408, col="red", lwd=3)
@@ -578,7 +579,7 @@ In our project we decided to look at the results of an individual driver, but it
 
 # Conclusion what was learned from the data analysis
 
-We found that we can relatively well describe Lewis Hamilton's score by using a model with his previous results. It is not perfect, but with his consistency, and his recent results, they all fall well within the expected values in our model. If we could get him to drive for, say 100 more years with relatively even consistency, we could probably plot the results close to our plot.
+We found that we can relatively well describe Lewis Hamilton's score by using a model with his previous results. It is not perfect, but with his consistency, and his recent results, they all fall well within the expected values in our model. One thing we could see was that his 2022 performance was something that even the model thought was unlikely for the simulations, but it still happened. If we could get him to drive for, say 100 more years with relatively even consistency, we could probably plot the results close to our plot.
 
 # Self-reflection
 
