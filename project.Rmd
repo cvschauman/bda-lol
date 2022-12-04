@@ -14,6 +14,7 @@ urlcolor: blue
 #Provided code and imports
 library("rstan")
 library(matrixStats)
+library(knitr)
 library(loo)
 set.seed(23)
 ham_data = read.csv("ham_data.csv", header=FALSE)
@@ -271,8 +272,8 @@ Since the values of these normal distributions, go beyond the max points, i.e. 2
 hier_monitor = data.frame(monitor(hier_fit, print=FALSE))
 pool_monitor = data.frame(monitor(pool_fit, print=FALSE))
 
-r_hier_mean = mean(summary(hier_fit)$summary[1:113,10])
-r_pool_mean = mean(summary(pool_fit)$summary[1:108,10])
+r_hier_mean = mean(summary(hier_fit)$summary[1:8,10])
+r_pool_mean = mean(summary(pool_fit)$summary[1:3,10])
 
 ```
 
@@ -285,8 +286,8 @@ Since these $\widehat{R}$ values are under 1.05, the chains have most likely mix
 
 Another convergence diagnostic we can look at is the ESS value we get out of the fits.
 
--   Bulk ESS of the hierarchical model: `r round(mean(hier_monitor[["Bulk_ESS"]][1:113]),2)`
--   Tail ESS of the hierarchical model: `r round(mean(hier_monitor[["Tail_ESS"]][1:113]),2)`
+-   Bulk ESS of the hierarchical model: `r round(mean(hier_monitor[["Bulk_ESS"]][1:8]),2)`
+-   Tail ESS of the hierarchical model: `r round(mean(hier_monitor[["Tail_ESS"]][1:8]),2)`
 -   Bulk ESS of the pooled model: `r round(mean(pool_monitor[["Bulk_ESS"]][1:3]),2)`
 -   Tail ESS of the pooled model: `r round(mean(pool_monitor[["Tail_ESS"]][1:3]),2)`
 
