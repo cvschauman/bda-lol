@@ -52,21 +52,34 @@ legend(
 )
 ```
 
-# Description of models
+# Description of models and priors used
 
-# Priors used
+The models we used, with priors are:
 
-For our parameters $\mu$ and $\sigma$ we used weekly informative priors based on the appearance of the data. The final priors chosen where the following:
 
 Hierarchical Model:
 
-$\mu_{hyperprior} = 20$\  
-$\sigma_{hyperprior} = 7$\  
+$y_{ij} \sim \mathcal{N}(\mu_j, \sigma_j)$  
+$\mu_j \sim \mathcal{N}(\mu_{hyperprior}, \sigma_{hyperprior})$  
+$\sigma_j = Gamma(1,1)$  
+$\mu_{hyperprior} = \mathcal{N}(0, \mu_{prior})$  
+$\tau = Inv-\chi^2(\sigma_{prior})$  
+$\sigma_{prior} = 7$
+$\mu_{prior} = 20$
+
+\newpage
+
 
 Pooled Model:
 
-$\mu_{prior} = 20$\  
+
+$y_{ij} \sim \mathcal{N}(\mu_j, \sigma_j)$  
+$\mu_j \sim \mathcal{N}(0, \mu_{prior})$  
+$\sigma_j = Inv-\chi^2(\sigma_{prior})$  
 $\sigma_{prior} = 7$  
+$\mu_{prior} = 20$  
+
+The priors were chosen mostly based on looking at the data and, after some testing, seeing what fit well.
 
 # Rstan code
 
