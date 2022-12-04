@@ -71,30 +71,34 @@ data {
 }
 
 parameters {
-  real<lower=0> mu;
+  real<lower=0> muh;
   real<lower=0> sigma;
   real<lower=0> tau;
-  vector[J] mus;
+  vector[J] mu;
 }
 
 model {
-  mu ~ normal(0, mu_s);
+  //Hyperpriors
   tau ~ inv_chi_square(sigma_prior);
+  muh ~ normal(0, mu_s);
+
+  //priors
   sigma ~ gamma(1,1);
-  mus ~ normal(mu, tau);
+  mu ~ normal(muh, tau);
+  
   for (j in 1:J)
-    y[,j] ~ normal(mus[j], sigma);
+    y[,j] ~ normal(mu[j], sigma);
 }
 
 generated quantities {
   vector[J] log_lik[N];
   real ypred;
   real ypred_6;
-  ypred = normal_rng(mus[5], sigma);
-  ypred_6 = normal_rng(mu, sigma);
+  ypred = normal_rng(mu[5], sigma);
+  ypred_6 = normal_rng(muh, sigma);
   for (j in 1:J){
     for (n in 1:N){
-      log_lik[n,j] = normal_lpdf(y[n,j] | mus[j], sigma);
+      log_lik[n,j] = normal_lpdf(y[n,j] | mu[j], sigma);
     }
   }
 }
@@ -383,6 +387,8 @@ When comparing the simulated data with the actual real world data we can see tha
 
 # Model comparison
 
+Our models compared to each other in one graph looks like this. As we can see, they are relatively similar. To check performance and comparing them, we will also use PSIS-LOO values.
+
 ```{r, echo=FALSE, warning=FALSE}
 df <- data.frame(ham_pool_extracted, ham_extracted)
 colnames(df) <- c("points_pool", "points_hier")
@@ -407,14 +413,20 @@ ggplot(
   0,
   26
 )
+```
 
+```{r}
 hier_extracted = extract_log_lik(hier_fit, merge_chains = FALSE)
 r_eff = relative_eff(exp(hier_extracted))
 hier_loo = loo(hier_extracted, r_eff = r_eff)
 hier_elpd = hier_loo$estimates["elpd_loo",1]
-#paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
+paste("Hierarchical model PSIS-LOO elpd value: ", round(hier_elpd,1))
+hier_loo
 plot(hier_loo)
 ```
+
+
+
 
 # Discussion of issues and potential improvements
 
